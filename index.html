@@ -5,12 +5,33 @@
         <link rel="stylesheet" href="estilo.css">
     </head>
     <body>
-        <header>
+        <div class="container">
+            <div class="row">
+                <div id="corpo" class=" col-8 bg-primary order-2">
+                    <ul id="mensagens"></ul>
+                </div>
+                <div id="usuarios" class="col-4 bg-success order-1">
+                    <h4>usuarios conectados</h4>
+                </div>
+                <div class="col-6 order-3">
+                    <form>
+                        <input autofocus type='text' id='msg' placeholder="Digite uma mensagem" autocomplete="off" /> 
+                        <button type='submit'>Enviar</button>
+                    </form>
+                </div>
+                <div id="status" class="col-4 order-4">
+                    <span id="usuario">
+                        <h4>nickname:</h4>
+                    </span>
+                    <span id="msg"></span>
+                </div>
+            </div>
+        </div>
             <form>
                 <input autofocus type='text' id='msg' placeholder="Digite uma mensagem" autocomplete="off" /> 
                 <button type='submit'>Enviar</button>
             </form>
-        </header>
+        
         <ul id='messages'></ul>
         <div id='status'></div>
 
@@ -21,7 +42,11 @@
                 const socket = io()
                 socket.nickname = ''
 
+                socket.on('onLine',clientList => clientList.forEach(client => $('#usuarios').append(`<p>${client}</p>`)))
+
                 $('form').submit(function(){
+
+
                     if(socket.nickname === ''){
                         socket.nickname = $('#msg').val()
                         socket.emit('login', socket.nickname)
@@ -50,9 +75,17 @@
                     return false
                 })
 
-                socket.on('chat msg', function(msg){
+                socket.on('conectados', clientList => {
+                    $('p').detach()
+                    clientList.forEach(client => $('#usuarios').append(`<p>${client}</p>`))
+                })
+
+                socket.on('chat msg', function(nickname, msg){
+                    if(msg != nickname)
                     $('#messages').append($('<li>').text(msg))
                 })
+
+
             })
         </script>
     </body>

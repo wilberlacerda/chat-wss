@@ -77,3 +77,13 @@ form button {
   font-size: 16px;
   padding: 13px 30px;
 }
+
+#corpo,#usuarios{
+  height: 400px;
+  max-height: 400px;
+  overflow: scroll;
+  overflow: auto;
+}
+#usuario h4{
+  display: inline;
+}
