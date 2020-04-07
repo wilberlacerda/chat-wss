@@ -44,4 +44,3 @@ serverSocket.on('connect', function(socket){
         socket.broadcast.emit('status', msg)
     })
 })
-
