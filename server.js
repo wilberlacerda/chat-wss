@@ -1,46 +1,38 @@
 const express = require('express')
 const app = express()
-
-app.use(express.static("public"))
-
+app.use(express.static('public'))
 const http = require('http').Server(app)
 const serverSocket = require('socket.io')(http)
-
-const porta = process.env.PORT || 8000
-
-const host = process.env.HEROKU_APP_NAME ? `https://${process.env.HEROKU_APP_NAME}.herokuapp.com` : "http://localhost"
+const porta = 8000
 
 http.listen(porta, function(){
-    const portaStr = porta === 80 ? '' :  ':' + porta
-
-    if (process.env.HEROKU_APP_NAME) 
-        console.log('Servidor iniciado. Abra o navegador em ' + host)
-    else console.log('Servidor iniciado. Abra o navegador em ' + host + portaStr)
+    console.log('Servidor iniciado. Abra o navegador em http://localhost:'+porta);
 })
 
-app.get('/', function (requisicao, resposta) {
-    resposta.sendFile(__dirname + '/index.html')
+app.get('/', function(req, resp){
+    resp.sendFile(__dirname + '/index.html')
 })
 
-
-serverSocket.on('connect', function(socket){
-    socket.on('login', function (nickname) {
+serverSocket.on('connection', function(socket){
+    
+    socket.on('login', function(nickname) {
+        console.log('Cliente conectado: '+ nickname)
+        serverSocket.emit('chat-msg', `Usuário ${nickname} conectou.`)
         socket.nickname = nickname
-        const msg = nickname + ' conectou'
-        console.log(msg)
-        serverSocket.emit('chat msg', msg)
     })
 
     socket.on('disconnect', function(){
         console.log('Cliente desconectado: ' + socket.nickname)
-    })
-        
-    socket.on('chat msg', function(msg){
-        serverSocket.emit('chat msg', `${socket.nickname} diz: ${msg}`)
+        serverSocket.emit('chat-msg',  socket.nickname + ' saiu') /*Informa as outros usuarios, que um cliente desconectou*/
     })
 
-    socket.on('status', function(msg){
-        console.log(msg)
+    socket.on('chat-msg', function(msg) {
+        console.log(`Msg recebida de ${socket.nickname}: ${msg}`);
+        serverSocket.emit('chat-msg', `${socket.nickname}: ${msg}`)
+    })
+
+    socket.on('status', function(msg) {
         socket.broadcast.emit('status', msg)
     })
+
 })
