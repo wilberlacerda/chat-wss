@@ -4,6 +4,7 @@
         <title>Chat</title>
         <link rel="stylesheet" href="estilo.css">
     </head>
+    <body>
     <header>
         <form id="form">
             <input type="text" id="msg" autofocus autocomplete="off" placeholder="Digite uma mensagem:">
@@ -15,7 +16,7 @@
     <div id="status"></div>
     
     <script>
-        
+        //Função que envia a msg p/ servidor
         $(function(){
             const socket = io()
             socket.nickname = ''
@@ -44,7 +45,7 @@
                 $('#msg').val('')
                 return false
             })
-            
+            //Função que recebe a msg do servidor
             socket.on('chat-msg', function(msg){
                 $('#mensagens').append($('<li>').text(msg))
             })
